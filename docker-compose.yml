@@ -1,0 +1,29 @@
+version: "3.0"
+
+# Run docker compose file:
+# > docker compose up
+services:
+  web: #name of the docker container
+    build: . #path to Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 3000:3000 # map port 3000 of host system with port 3000 of docker container
+    volumes:
+      - .:/usr/src/app # map current directory to docker directory: docker volume ls, docker volume inspect <volumeName>
+    command: air run cmd/main.go -b 0.0.0.0 # run this command when starting the service
+    # '-b 0.0.0.0' to bind container and browser allowing them to talk to one another
+  db:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-db:/var/lib/postgres/data # bind a named volume to a directory
+
+# named volume
+volumes:
+  postgres-db:
